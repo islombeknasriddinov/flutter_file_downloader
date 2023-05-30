@@ -4,6 +4,8 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_file_downloader/main.dart';
+import 'package:flutter_file_downloader/utils/notification_util.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -19,11 +21,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    NotificationUtil.initialize(flutterLocalNotificationsPlugin);
+
     IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) {
       String id = data[0];
       DownloadTaskStatus status = DownloadTaskStatus(data[1]);
       int progress = data[2];
+
+      print("progress $progress");
       setState(() {});
     });
 
@@ -56,27 +62,41 @@ class _HomePageState extends State<HomePage> {
 
   Future download({required String url}) async {
     var status = await Permission.storage.request();
-    Directory ios = await getApplicationDocumentsDirectory();
-    print("ios $ios");
-    print(status.isGranted);
+/*    Directory? ios = await getDownloadsDirectory();
+    print("ios $ios");*/
+/*
+    Directory? android = await getExternalStorageDirectory();
+    print("android :${android?.path}");
+    print(status.isGranted);*/
 
     if (status.isGranted) {
-     try{
-       await FlutterDownloader.enqueue(
-         url: url,
-         savedDir: ios.path,
-         fileName: "Test.zip",
-         showNotification: true,
-         openFileFromNotification: true,
-       );
+      try {
+        await FlutterDownloader.enqueue(
+          url: url,
+          savedDir: "/storage/emulated/0/Download",
+          fileName: "Test.zip",
+          showNotification: false,
+          openFileFromNotification: false,
+        );
 
-       final file=File("${ios.path}/Test.zip");
-      final fileByte=await file.readAsBytes();
-       print(getFileSizeString(bytes:fileByte.length));
-
-     }catch(e,st){
-       print("${e.toString()}\n ${st}");
-     }
+        final file = File("/storage/emulated/0/Download/Test.zip");
+        bool fileByte = file.existsSync();
+        if (fileByte == true) {
+          NotificationUtil.showBigTextNotification(
+            title: "Your file has downloaded successfully ",
+            body: "Done",
+            fl: flutterLocalNotificationsPlugin,
+          );
+        } else {
+          NotificationUtil.showBigTextNotification(
+            title: "Downloaded file failure",
+            body: "Fail",
+            fl: flutterLocalNotificationsPlugin,
+          );
+        }
+      } catch (e, st) {
+        print("${e.toString()}\n ${st}");
+      }
     }
   }
 

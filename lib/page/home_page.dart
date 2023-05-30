@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_file_downloader/main.dart';
 import 'package:flutter_file_downloader/utils/notification_util.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -18,10 +20,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ReceivePort _port = ReceivePort();
+  final String saveDir = "/storage/emulated/0/Download";
 
   @override
   void initState() {
-    NotificationUtil.initialize(flutterLocalNotificationsPlugin);
+    NotificationUtil.initialize(
+      flutterLocalNotificationsPlugin,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        print("------------onDidReceiveNotificationResponse---------------");
+        print("actionId ${response.actionId}");
+        print("id ${response.id}");
+        print("input ${response.input}");
+        print("notificationResponseType ${response.notificationResponseType.name}");
+        print("payload ${response.payload}");
+      },
+    );
 
     IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) {
@@ -73,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       try {
         await FlutterDownloader.enqueue(
           url: url,
-          savedDir: "/storage/emulated/0/Download",
+          savedDir: saveDir,
           fileName: "Test.zip",
           showNotification: false,
           openFileFromNotification: false,

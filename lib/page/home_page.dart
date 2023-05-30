@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -57,18 +58,33 @@ class _HomePageState extends State<HomePage> {
     var status = await Permission.storage.request();
     Directory ios = await getApplicationDocumentsDirectory();
     print("ios $ios");
-    Directory? android = await getExternalStorageDirectory();
-    print("android $android");
+    print(status.isGranted);
+
     if (status.isGranted) {
-      await FlutterDownloader.enqueue(
-        url: url,
-        savedDir: ios.toString(),
-        fileName: "Test.zip",
-        showNotification: true,
-        openFileFromNotification: true,
-        requiresStorageNotLow: false,
-      );
+     try{
+       await FlutterDownloader.enqueue(
+         url: url,
+         savedDir: ios.path,
+         fileName: "Test.zip",
+         showNotification: true,
+         openFileFromNotification: true,
+       );
+
+       final file=File("${ios.path}/Test.zip");
+      final fileByte=await file.readAsBytes();
+       print(getFileSizeString(bytes:fileByte.length));
+
+     }catch(e,st){
+       print("${e.toString()}\n ${st}");
+     }
     }
+  }
+
+  static String getFileSizeString({required int bytes, int decimals = 0}) {
+    const suffixes = ["b", "kb", "mb", "gb", "tb"];
+    if (bytes == 0) return '0${suffixes[0]}';
+    var i = (log(bytes) / log(1024)).floor();
+    return "${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}";
   }
 
   @override

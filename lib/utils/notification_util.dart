@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+typedef FNP = FlutterLocalNotificationsPlugin;
+
 class NotificationUtil {
   static Future initialize(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
     var androidInit = const AndroidInitializationSettings("mipmap/ic_launcher");
@@ -11,25 +13,28 @@ class NotificationUtil {
   static Future showBigTextNotification({
     var id = 0,
     var payload,
+    required String channelId,
     required String title,
     required String body,
     required FlutterLocalNotificationsPlugin fl,
   }) async {
-    AndroidNotificationDetails androidNotificationDetails = const AndroidNotificationDetails(
-      "test_channel",
-      "channelName",
+    AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(
+      channelId,
+      channelId,
       playSound: true,
       importance: Importance.max,
-      priority: Priority.high,
+      priority: Priority.max,
+      enableLights: true,
+      enableVibration: true,
     );
 
     DarwinNotificationDetails iosNotificationDetails = const DarwinNotificationDetails();
 
-    var noti = NotificationDetails(
+    var notificationDetails = NotificationDetails(
       android: androidNotificationDetails,
       iOS: iosNotificationDetails,
     );
 
-    await fl.show(0, title, body, noti);
+    await fl.show(id, title, body, notificationDetails);
   }
 }

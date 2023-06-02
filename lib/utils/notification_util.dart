@@ -32,6 +32,8 @@ class NotificationUtil {
       priority: Priority.max,
       enableLights: true,
       enableVibration: true,
+      category: AndroidNotificationCategory.message,
+      channelAction: AndroidNotificationChannelAction.update,
     );
 
     DarwinNotificationDetails iosNotificationDetails = const DarwinNotificationDetails();

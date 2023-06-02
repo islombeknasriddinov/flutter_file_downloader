@@ -4,7 +4,11 @@ import 'package:flutter_file_downloader/page/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterDownloader.initialize(debug: true, ignoreSsl: false);
+  try {
+    await FlutterDownloader.initialize(debug: true, ignoreSsl: false);
+  } catch (e, st) {
+    print("error : $e, $st");
+  }
 
   runApp(const MyApp());
 }

@@ -1,13 +1,9 @@
 import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_file_downloader/main.dart';
 import 'package:flutter_file_downloader/utils/file_downloader_util.dart';
 import 'package:flutter_file_downloader/utils/notification_util.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
